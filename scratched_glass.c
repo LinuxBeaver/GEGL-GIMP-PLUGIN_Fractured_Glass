@@ -132,6 +132,7 @@ typedef struct
  GeglNode *cubism;
  GeglNode *colorerase;
  GeglNode *whitebg;
+ GeglNode *crop;
  GeglNode *output;
 }State;
 
@@ -182,6 +183,8 @@ static void attach (GeglOperation *operation)
 
  state->cubism = gegl_node_new_child (gegl, "operation", "gegl:cubism", NULL);
 
+ state->crop = gegl_node_new_child (gegl, "operation", "gegl:crop", NULL);
+
  state->colorerase = gegl_node_new_child (gegl, "operation", "gimp:layer-mode", "layer-mode", 57, "blend-space", 1, NULL);
 
 
@@ -205,10 +208,11 @@ update_graph (GeglOperation *operation)
   State *state = o->user_data;
   if (!state) return;
 
-  gegl_node_link_many (state->input, state->whitebg, state->shadowhighlightstuff, state->blur, state->idref, state->colorerase, state->behind, state->hardlightdog, state->lightness, state->saturation,  state->output,  NULL);
+  gegl_node_link_many (state->input, state->whitebg, state->shadowhighlightstuff, state->blur, state->idref, state->colorerase, state->behind, state->hardlightdog, state->lightness, state->saturation, state->crop,  state->output,  NULL);
   gegl_node_connect (state->colorerase, "aux", state->emboss, "output"); 
   gegl_node_connect (state->behind, "aux", state->idref, "output"); 
   gegl_node_link_many (state->idref, state->cubism, state->emboss,  NULL);
+  gegl_node_connect (state->crop, "aux", state->input, "output"); 
 /*optional connect from and too is here
   gegl_node_connect (state->blendmode, "aux", state->lastnodeinlist, "output"); */
 
